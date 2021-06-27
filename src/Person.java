@@ -7,9 +7,9 @@ public class Person {
     private String name;
     private int id;
     private int age;
-    private char vehicleCategory;
+    private String vehicleCategories;
 
-    public Person(String name, int id, int age, char vehicleCategory) throws PersonException {
+    public Person(String name, int id, int age, String vehicleCategories) throws PersonException {
         if(name.matches("\\D*-\\D*")) {
             throw new PersonException("The name can't contain '-' or numbers: " + name);
         }
@@ -19,22 +19,24 @@ public class Person {
         if(age <= 0) {
             throw new PersonException("Age can't be less or equal than zero");
         }
-        if("ABCDMT".lastIndexOf(vehicleCategory) == -1) {
-            throw new PersonException("There is no such vehicle category");
+        for(char category : vehicleCategories.toCharArray()) {
+            if ("ABCDMT".lastIndexOf(category) == -1) {
+                throw new PersonException("There is no such vehicle category");
+            }
         }
         this.name = name;
         this.id = id;
         this.age = age;
-        this.vehicleCategory = vehicleCategory;
+        this.vehicleCategories = vehicleCategories;
     }
 
     public static Person read(Scanner scanner) throws PersonException {
         String data[] = scanner.nextLine().split("-");
-        if(data.length < 4 || data[3].length() > 1) {
+        if(data.length < 4) {
             throw new PersonException("There wrong format of the input: " + data);
         }
         try {
-            Person person = new Person(data[0], Integer.getInteger(data[1]), Integer.getInteger(data[2]), data[3].charAt(0));
+            Person person = new Person(data[0], Integer.getInteger(data[1]), Integer.getInteger(data[2]), data[3]);
             return person;
         } catch (Exception e) {
             throw new PersonException("Problems with the format" + e.getMessage());
@@ -48,7 +50,7 @@ public class Person {
         writer.write('-');
         writer.write(age);
         writer.write('-');
-        writer.write(vehicleCategory);
+        writer.write(vehicleCategories);
         writer.write('\n');
     }
 
@@ -64,8 +66,8 @@ public class Person {
         return age;
     }
 
-    public char getVehicleCategory() {
-        return vehicleCategory;
+    public String getVehicleCategory() {
+        return vehicleCategories;
     }
 
     public void updateAge() {
