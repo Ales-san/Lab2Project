@@ -16,8 +16,8 @@ public class Person {
         if(id < 0) {
             throw new PersonException("ID can't be less than zero");
         }
-        if(age <= 0) {
-            throw new PersonException("Age can't be less or equal than zero");
+        if(age <= 0 || age > 150) {
+            throw new PersonException("Age can't be less or equal than zero and more than 150");
         }
         for(char category : vehicleCategories.toCharArray()) {
             if ("ABCDMT".lastIndexOf(category) == -1) {
