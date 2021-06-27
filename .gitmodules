@@ -1,0 +1,4 @@
+[submodule "Lab2Library"]
+	path = Lab2Library
+	url = https://github.com/Ales-san/Lab2Library
+	branch = files
