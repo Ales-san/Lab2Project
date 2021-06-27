@@ -18,17 +18,31 @@ public class DriverDatabase {
             try {
                 String name = data[0];
                 String number = data[1];
-                int id = Integer.getInteger(data[2]);
+                int id = Integer.parseInt(data[2]);
                 char category = data[3].charAt(0);
-                Vehicle vehicle = switch (category) {
-                    case 'A' -> new Motorbike(name, number, id);
-                    case 'B' -> new Car(name, number, id);
-                    case 'C' -> new Truck(name, number, id);
-                    case 'D' -> new Bus(name, number, id);
-                    case 'T' -> new Tram(name, number, id);
-                    case 'M' -> new Moped(name, number, id);
-                    default -> throw new DatabaseException("No such category!");
-                };
+                Vehicle vehicle;
+                switch (category) {
+                    case 'A':
+                        vehicle = new Motorbike(name, number, id);
+                        break;
+                    case 'B':
+                        vehicle = new Car(name, number, id);
+                        break;
+                    case 'C':
+                        vehicle = new Truck(name, number, id);
+                        break;
+                    case 'D':
+                        vehicle = new Bus(name, number, id);
+                        break;
+                    case 'T':
+                        vehicle = new Tram(name, number, id);
+                        break;
+                    case 'M':
+                        vehicle = new Moped(name, number, id);
+                        break;
+                    default:
+                        throw new DatabaseException("No such category!");
+                }
                 if(database.containsKey(id)) {
                     database.get(id).add(vehicle);
                 } else {
@@ -37,7 +51,7 @@ public class DriverDatabase {
                     database.put(id, vehicles);
                 }
             } catch (Exception e) {
-                throw new DatabaseException("Problems with the format" + e.getMessage());
+                throw new DatabaseException("Problems with the format: " + e.getMessage());
             }
         }
     }
@@ -54,7 +68,7 @@ public class DriverDatabase {
                     writer.write("-");
                     writer.write(vehicle.getNumber());
                     writer.write("-");
-                    writer.write(vehicle.getOwnerId());
+                    writer.write(Integer.toString(vehicle.getOwnerId()));
                     writer.write("-");
                     writer.write(vehicle.getRequiredCategory());
                     writer.write('\n');
@@ -73,10 +87,20 @@ public class DriverDatabase {
         return (ArrayList<Vehicle>) database.getOrDefault(id, new ArrayList<>()).clone();
     }
 
-    public void addVehicle(int id, Vehicle vehicle) throws DatabaseException {
-        if(vehicle.getOwnerId() != id) {
-            throw new DatabaseException("Vehicle owner id doesn't match with this id: " + id + ' ' + vehicle.getOwnerId());
+    public void addVehicle(Person person, Vehicle vehicle) throws DatabaseException {
+        if(person.getAge() < vehicle.getRequiredAge()) {
+            throw new DatabaseException(person.getName() + " is too young for the " + vehicle.getVehicleType());
         }
+        if(person.getVehicleCategory().lastIndexOf(vehicle.getRequiredCategory()) == -1) {
+            throw new DatabaseException(person.getName() + " can't be the driver of the " + vehicle.getVehicleType() + " because of the driver license");
+        }
+        if(person.getId() != vehicle.getOwnerId()) {
+            throw new DatabaseException("Vehicle owner id doesn't match with this id: " + person.getId() + ' ' + vehicle.getOwnerId());
+        }
+        addVehicle(person.getId(), vehicle);
+    }
+
+    private void addVehicle(int id, Vehicle vehicle) throws DatabaseException {
         if(database.containsKey(id)) {
             database.get(id).add(vehicle);
         } else {
